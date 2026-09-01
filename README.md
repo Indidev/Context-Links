@@ -223,3 +223,13 @@ custom shortcuts on websites whose URL matches a regex you configure.
   document itself for the options page/popup) and inlines a copy there
   specifically — a copy sitting in the page's light DOM wouldn't be
   visible to `<use>` elements inside the panel's shadow root.
+
+## License
+
+Copyright (c) 2026 Dominik Breitling. Licensed under
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) (Attribution-
+NonCommercial) — see [`LICENSE.txt`](LICENSE.txt) for the full text.
+
+The bundled Tabler Icons sprite (`icons/tabler-sprite.svg`,
+`icons/tabler-icons-data.js`) is a separate third-party asset under the MIT
+License — see [`icons/TABLER-ICONS-LICENSE.txt`](icons/TABLER-ICONS-LICENSE.txt).

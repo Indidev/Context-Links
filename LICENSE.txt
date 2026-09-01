@@ -1,3 +1,16 @@
+Copyright (c) 2026 Dominik Breitling
+
+This work is licensed under the Creative Commons Attribution-NonCommercial
+4.0 International License (CC BY-NC 4.0). To view a copy of this license,
+visit https://creativecommons.org/licenses/by-nc/4.0/ or see the full legal
+code below.
+
+Note: the Tabler Icons sprite bundled under icons/tabler-sprite.svg is a
+separate third-party asset licensed under the MIT License, not this license
+- see icons/TABLER-ICONS-LICENSE.txt for its terms.
+
+=======================================================================
+
 Attribution-NonCommercial 4.0 International
 
 =======================================================================
