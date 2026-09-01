@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>URL Shortcuts – Settings</title>
+<link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <h1>Context Links</h1>
+    <div class="top-actions">
+      <label class="switch" title="Show or hide the floating shortcuts overlay on pages. To disable the extension entirely, use Chrome's own extensions menu.">
+        <input type="checkbox" id="overlay-enabled" />
+        <span>Overlay</span>
+      </label>
+      <button id="export-btn" class="btn secondary">Export</button>
+      <button id="import-btn" class="btn secondary">Import</button>
+      <input type="file" id="import-file" accept="application/json" hidden />
+      <div class="theme-toggle" id="theme-toggle" role="radiogroup" aria-label="Theme">
+        <button type="button" class="theme-option" data-theme="light" data-icon=":sun" title="Always light" aria-label="Light"></button>
+        <button type="button" class="theme-option" data-theme="system" data-icon=":brightness-auto" title="Match your system/browser setting" aria-label="Auto"></button>
+        <button type="button" class="theme-option" data-theme="dark" data-icon=":moon" title="Always dark" aria-label="Dark"></button>
+      </div>
+      <span id="save-status" class="save-status"></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="position-section">
+      <h2>Shortcut panel position</h2>
+      <p class="hint">Click where you'd like the shortcuts to appear.</p>
+      <div class="position-layout">
+        <div class="position-picker" id="position-picker" role="radiogroup" aria-label="Shortcut panel position">
+          <div class="picker-bar">
+            <button type="button" class="picker-zone bar-zone" data-position="shortcutbar-left"
+                    role="radio" title="Shortcut bar - left aligned">
+              <span class="bar-dots"><span></span><span></span><span></span></span>
+            </button>
+            <span class="bar-label">shortcut bar</span>
+            <button type="button" class="picker-zone bar-zone" data-position="shortcutbar-right"
+                    role="radio" title="Shortcut bar - right aligned">
+              <span class="bar-dots"><span></span><span></span><span></span></span>
+            </button>
+          </div>
+          <div class="picker-page">
+            <span class="page-line"></span>
+            <span class="page-line short"></span>
+            <span class="page-line"></span>
+            <button type="button" class="picker-zone corner-zone tl" data-position="top-left"
+                    role="radio" title="Top left"></button>
+            <button type="button" class="picker-zone corner-zone tr" data-position="top-right"
+                    role="radio" title="Top right"></button>
+            <button type="button" class="picker-zone corner-zone bl" data-position="bottom-left"
+                    role="radio" title="Bottom left"></button>
+            <button type="button" class="picker-zone corner-zone br" data-position="bottom-right"
+                    role="radio" title="Bottom right"></button>
+          </div>
+        </div>
+
+        <div class="position-preview">
+          <div class="preview-frame" id="preview-frame">
+            <div class="preview-page-content" id="preview-page-content">
+              <span class="preview-line"></span>
+              <span class="preview-line short"></span>
+              <span class="preview-line"></span>
+            </div>
+            <div class="preview-panel" id="preview-panel">
+              <div class="list" id="preview-list"></div>
+              <button type="button" class="toggle-btn" tabindex="-1"><img src="icons/icon-overlay.svg" alt="" /></button>
+            </div>
+          </div>
+          <p class="hint">Live preview with example shortcuts</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="appearance-section">
+      <h2>Appearance</h2>
+      <p class="hint">
+        Customize the shortcut panel's look. The text color also colors any Tabler icon (they're
+        stroke-based, not fixed images); size scales icons and text together.
+      </p>
+      <div class="appearance-row">
+        <label class="color-field">
+          <span>Background</span>
+          <input type="color" id="color-background" />
+        </label>
+        <label class="color-field opacity-field">
+          <span>Background Opacity</span>
+          <input type="range" id="color-opacity" min="10" max="100" step="1" />
+          <span id="opacity-label" class="opacity-label">100%</span>
+        </label>
+        <label class="color-field">
+          <span>Text &amp; icons</span>
+          <input type="color" id="color-text" />
+        </label>
+        <label class="color-field size-field">
+          <span>Size</span>
+          <input type="range" id="appearance-size" min="10" max="28" step="1" />
+          <span id="appearance-size-label" class="opacity-label">14px</span>
+        </label>
+        <label class="color-field checkbox-field">
+          <input type="checkbox" id="show-text-with-icons" />
+          <span>Display Text with Icons</span>
+        </label>
+        <button id="reset-colors-btn" class="btn secondary">Reset to default</button>
+      </div>
+    </section>
+
+    <section class="animation-section">
+      <h2>Animation</h2>
+      <p class="hint">
+        How shortcuts appear/disappear (toggling the panel, or a rule starting/stopping to
+        match). Click the <button type="button" class="toggle-btn"><img src="icons/icon-overlay.svg"/></button> in the live preview above to try it out.
+      </p>
+      <div class="animation-row">
+        <label class="animation-field">
+          <span>Style</span>
+          <select id="animation-type">
+            <option value="none">None (instant)</option>
+            <option value="balloon">Balloon - float in/out, grow/shrink</option>
+            <option value="pop">Pop - scale in one by one</option>
+            <option value="fade">Fade - opacity only</option>
+          </select>
+        </label>
+        <label class="animation-field">
+          <span>Duration</span>
+          <input type="range" id="animation-duration" min="50" max="2000" step="50" />
+          <span id="animation-duration-label" class="opacity-label">500ms</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="test-box">
+      <h2>Test a URL</h2>
+      <input type="text" id="test-url" placeholder="https://example.com/some/page" />
+      <div id="test-results" class="test-results"></div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2>Rules</h2>
+        <button id="add-rule-btn" class="btn primary">+ Add rule</button>
+      </div>
+      <p class="hint">
+        Each rule matches pages whose URL tests true against a regular expression. Every shortcut
+        inside a matching rule is shown in the floating panel. Add conditions to also exclude a
+        pattern, or to match an alternate pattern instead (e.g. match
+        <code>google.com/.*</code> except <code>google.com/maps</code>, or show the same
+        shortcuts on <code>google.com/search</code> OR <code>bing.com/search</code>).
+      </p>
+      <div id="rules-container"></div>
+    </section>
+  </main>
+
+  <template id="rule-template">
+    <div class="rule-card">
+      <div class="rule-head">
+        <span class="rule-drag-handle" draggable="true" title="Drag to reorder">⠿</span>
+        <button type="button" class="rule-toggle" title="Expand/collapse rule">▸</button>
+        <label class="switch small">
+          <input type="checkbox" class="rule-enabled" />
+        </label>
+        <input type="text" class="rule-name" placeholder="Unnamed rule" />
+        <span class="rule-summary"></span>
+        <button class="btn danger delete-rule-btn" title="Delete rule">✕</button>
+      </div>
+      <div class="rule-body">
+        <div class="rule-pattern-row">
+          <input type="text" class="rule-pattern" placeholder="regex, e.g. ^https://www\.google\.com/" />
+          <input type="text" class="rule-flags" placeholder="flags" size="4" title="Regex flags, e.g. i" />
+        </div>
+        <div class="extra-patterns-list"></div>
+        <button class="btn secondary add-extra-pattern-btn">+ Add condition</button>
+        <div class="shortcuts-list"></div>
+        <button class="btn secondary add-shortcut-btn">+ Add shortcut</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="extra-pattern-template">
+    <div class="extra-pattern-row">
+      <select class="ep-mode" title="Whether this pattern must NOT match, or is an alternate ('OR') way to match">
+        <option value="exclude">Must NOT match</option>
+        <option value="or">OR match</option>
+      </select>
+      <input type="text" class="ep-pattern" placeholder="regex, e.g. google\.com/maps" />
+      <input type="text" class="ep-flags" placeholder="flags" size="4" title="Regex flags, e.g. i" />
+      <button class="btn danger delete-extra-pattern-btn" title="Delete condition">✕</button>
+    </div>
+  </template>
+
+  <template id="shortcut-template">
+    <div class="shortcut-row">
+      <div class="shortcut-preview" aria-hidden="true"></div>
+      <div class="shortcut-fields">
+        <input type="text" class="sc-name" placeholder="Name" />
+        <input type="text" class="sc-description" placeholder="Description" />
+        <input type="text" class="sc-target" placeholder="Target URL (/path, https://..., or javascript:...)" />
+        <div class="icon-row">
+          <div class="icon-search-wrap">
+            <input type="text" class="sc-icon" placeholder="Icon URL, data: URI, or :search (e.g. :star)" autocomplete="off" />
+            <div class="tabler-suggestions" hidden></div>
+          </div>
+          <button class="btn secondary sc-icon-upload-btn">Upload</button>
+          <input type="file" class="sc-icon-file" accept="image/*" hidden />
+        </div>
+      </div>
+      <button class="btn danger delete-shortcut-btn" title="Delete shortcut">✕</button>
+    </div>
+  </template>
+
+  <script src="icons/tabler-icons-data.js"></script>
+  <script src="common.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

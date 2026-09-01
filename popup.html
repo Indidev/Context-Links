@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>URL Shortcuts</title>
+<link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <span class="title">URL Shortcuts</span>
+    <label class="switch" title="Show or hide the floating shortcuts overlay on pages">
+      <input type="checkbox" id="overlay-enabled" />
+      <span>Overlay</span>
+    </label>
+  </header>
+
+  <div id="list" class="list"></div>
+  <div id="empty" class="empty" hidden>No shortcuts match this page.</div>
+
+  <footer>
+    <button id="options-btn" class="btn secondary">Manage shortcuts</button>
+  </footer>
+
+  <script src="common.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

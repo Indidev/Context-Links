@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Packed extension output (built from source, and .pem is a private signing key)
+*.crx
+*.pem
+*.zip
+
+# Local dev-server config and scratch test harnesses used while iterating
+.claude/
+_preview-*.html

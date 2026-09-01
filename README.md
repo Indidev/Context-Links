@@ -1,4 +1,4 @@
-# Floating URL Shortcuts
+# Context Links
 
 A small Manifest V3 Chrome/Chromium extension that shows a floating panel of
 custom shortcuts on websites whose URL matches a regex you configure.
