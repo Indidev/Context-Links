@@ -29,7 +29,7 @@
   const DEFAULT_THEME = "system";
   const DEFAULT_SETTINGS = {
     enabled: true,
-    position: "bottom-right",
+    position: "bottom-left",
     appearance: DEFAULT_APPEARANCE,
     animation: DEFAULT_ANIMATION,
     theme: DEFAULT_THEME
