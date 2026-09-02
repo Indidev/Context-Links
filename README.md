@@ -5,6 +5,13 @@ custom shortcuts on websites whose URL matches a regex you configure.
 
 ![](media/example.gif)
 
+## Table of Contents
+
+- [Install (unpacked)](#install-unpacked)
+- [Concepts](#concepts)
+- [Using it](#using-it)
+- [License](#license)
+
 ## Install (unpacked)
 
 1. Open `chrome://extensions`.
@@ -179,6 +186,16 @@ custom shortcuts on websites whose URL matches a regex you configure.
   the popup could make an icon invisible (e.g. white icons on the popup's
   light list background).
 
+## Bucketlist
+
+* Optional blacklist regex for single links
+* Matching dark theme for short menu
+* Regex Builder (must have, optional, capture group,...)
+* Create Rule from current website
+* Import of rules/links: extend instead of replace
+* Export/Import of all Settings (with menu to select)
+  * Selective Rule/setting export
+  * Selective Rule/setting import
 
 ## License
 
