@@ -11,6 +11,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
 4. Click the extension icon and choose **Manage shortcuts** to open the
    options page and add rules.
 
+
 ## Concepts
 
 - **Rule**: a regex (`pattern` + optional `flags`, matched against the full
@@ -99,7 +100,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
   (top-left, top-right, bottom-left, bottom-right), or a side of the bar
   above it for a full-width bar docked to the top of the page
   (shortcutbar-left / shortcutbar-right, left/right-aligning the shortcuts
-  within that bar). This applies to all rules at once. Click the ![⚡](icons/icon16.png) toggle to
+  within that bar). This applies to all rules at once. Click the ![⚡](extension/icons/icon16.png) toggle to
   collapse/expand the panel (remembered per site).
 - Click a shortcut to navigate the current tab, or Ctrl/Cmd-click (or
   middle-click) to open it in a new tab. `javascript:` shortcuts always run
@@ -146,7 +147,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
   matching (e.g. during single-page-app navigation), or when the whole panel
   mounts/unmounts. Options:
   - `none` — instant, no animation (the original behavior).
-  - `balloon` — every icon flies from/to the ![⚡](icons/icon16.png) toggle's position while
+  - `balloon` — every icon flies from/to the ![⚡](extension/icons/icon16.png) toggle's position while
     growing/shrinking; all icons start together but each drifts at a
     slightly different speed.
   - `pop` — icons scale in/out in place (no movement), one after another —
@@ -154,7 +155,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
     disappearing (so it visually "collects" into the toggle last).
   - `fade` — a plain, synchronized opacity fade.
   - Duration (50–2000ms, default 500ms) is shared across all types and
-    disabled when `none` is selected. Click the ![⚡](icons/icon16.png) in the live preview to try
+    disabled when `none` is selected. Click the ![⚡](extension/icons/icon16.png) in the live preview to try
     the current selection before saving.
   - Only shortcuts that are actually appearing or disappearing animate — an
     unchanged shortcut across a re-render (e.g. the same rule still matching
@@ -188,13 +189,13 @@ custom shortcuts on websites whose URL matches a regex you configure.
   matches, so the footprint on non-matching sites is a single cheap regex
   test.
 - Chrome extension icons must be PNG (it doesn't support SVG for
-  `manifest.json`'s `icons`/`action.default_icon` fields). `icons/icon.svg`
+  `extension/manifest.json`'s `icons`/`action.default_icon` fields). `extension/icons/icon.svg`
   is the source of truth for the extension's own toolbar/store icon — edit it
-  and regenerate `icons/icon{16,32,48,128}.png` from it (e.g. via `cairosvg`,
+  and regenerate `extension/icons/icon{16,32,48,128}.png` from it (e.g. via `cairosvg`,
   rendering at high resolution and downsampling with a quality filter for
   crisper small sizes) rather than editing the PNGs directly.
-- The floating panel's own ![⚡](icons/icon16.png) toggle button uses a separate asset,
-  `icons/icon-overlay.svg` — same artwork as `icon.svg` but with the
+- The floating panel's own ![⚡](extension/icons/icon16.png) toggle button uses a separate asset,
+  `extension/icons/icon-overlay.svg` — same artwork as `icon.svg` but with the
   background dropped (transparent) and a thin outline added to the chain
   links instead, since it sits on top of the toggle button's own
   (user-configurable) accent color rather than a fixed dark square. Unlike
@@ -205,10 +206,10 @@ custom shortcuts on websites whose URL matches a regex you configure.
   so content scripts can load it into the pages they run on.
 - Tabler icon support bundles the official
   [`@tabler/icons-sprite`](https://tabler.io/icons) outline set (MIT
-  licensed — see `icons/TABLER-ICONS-LICENSE.txt`) as a single ~2.2MB sprite
-  file, `icons/tabler-sprite.svg` (all ~5,130 icons as `<symbol>` elements,
+  licensed — see `extension/icons/TABLER-ICONS-LICENSE.txt`) as a single ~2.2MB sprite
+  file, `extension/icons/tabler-sprite.svg` (all ~5,130 icons as `<symbol>` elements,
   rendered via `<use href="tabler-sprite.svg#tabler-NAME">`), plus
-  `icons/tabler-icons-data.js` (a generated `window.TABLER_ICON_NAMES` array
+  `extension/icons/tabler-icons-data.js` (a generated `window.TABLER_ICON_NAMES` array
   used only by the options page's `:`-search-in-the-icon-field feature).
   Bundled rather than loaded from a CDN at runtime, so icon search/rendering
   works fully offline and doesn't depend on a third party staying up. To
@@ -224,7 +225,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
   URL directly. `<use>` references across origins (an extension URL from a
   page on a different origin) are blocked by the browser ("Unsafe attempt
   to load URL... Domains, protocols and ports must match"), so
-  `buildIconElement()` in `common.js` fetches the sprite once and inlines
+  `buildIconElement()` in `extension/common.js` fetches the sprite once and inlines
   it into a hidden container, then points every icon's `<use>` at the
   local fragment. `<use>` fragment lookups are also scoped to the shadow
   tree they're rendered in, so `buildIconElement()` takes the actual
@@ -237,8 +238,8 @@ custom shortcuts on websites whose URL matches a regex you configure.
 
 Copyright (c) 2026 Dominik Breitling. Licensed under
 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) (Attribution-
-NonCommercial) — see [`LICENSE.txt`](LICENSE.txt) for the full text.
+NonCommercial) — see [`extension/LICENSE.txt`](extension/LICENSE.txt) for the full text.
 
-The bundled Tabler Icons sprite (`icons/tabler-sprite.svg`,
-`icons/tabler-icons-data.js`) is a separate third-party asset under the MIT
-License — see [`icons/TABLER-ICONS-LICENSE.txt`](icons/TABLER-ICONS-LICENSE.txt).
+The bundled Tabler Icons sprite (`extension/icons/tabler-sprite.svg`,
+`extension/icons/tabler-icons-data.js`) is a separate third-party asset under the MIT
+License — see [`extension/icons/TABLER-ICONS-LICENSE.txt`](extension/icons/TABLER-ICONS-LICENSE.txt).
