@@ -3,6 +3,8 @@
 A small Manifest V3 Chrome/Chromium extension that shows a floating panel of
 custom shortcuts on websites whose URL matches a regex you configure.
 
+![](media/example.gif)
+
 ## Install (unpacked)
 
 1. Open `chrome://extensions`.
@@ -94,6 +96,10 @@ custom shortcuts on websites whose URL matches a regex you configure.
 
 ## Using it
 
+
+![Options page, light theme](media/options_light.png){ height=100px }
+![Options page, dark theme](media/options_dark.png){ height=100px }
+
 - The floating panel appears on any page matching an enabled rule, in the
   corner (or bar) you pick on the options page's **Shortcut panel position**
   picker — click a corner of the little page mockup for a floating widget
@@ -146,14 +152,11 @@ custom shortcuts on websites whose URL matches a regex you configure.
   appear/disappear — when the panel is toggled, when a rule starts/stops
   matching (e.g. during single-page-app navigation), or when the whole panel
   mounts/unmounts. Options:
-  - `none` — instant, no animation (the original behavior).
-  - `balloon` — every icon flies from/to the ![⚡](extension/icons/icon16.png) toggle's position while
-    growing/shrinking; all icons start together but each drifts at a
-    slightly different speed.
-  - `pop` — icons scale in/out in place (no movement), one after another —
-    nearest to the toggle first when appearing, farthest first when
-    disappearing (so it visually "collects" into the toggle last).
-  - `fade` — a plain, synchronized opacity fade.
+  - Animations:
+
+| `none` | `balloon` | `pop` | `fade` |
+| ------ | --------- | ----- | ------ |
+| ![](media/animation_none.gif) | ![](media/animation_balloon.gif) | ![](media/animation_pop.gif) | ![](media/animation_fade.gif) |
   - Duration (50–2000ms, default 500ms) is shared across all types and
     disabled when `none` is selected. Click the ![⚡](extension/icons/icon16.png) in the live preview to try
     the current selection before saving.
@@ -170,7 +173,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
   scheme (`prefers-color-scheme`) live — there's no API for an extension
   page to read Chrome's own UI theme setting directly, so this is the
   closest equivalent and is what Chrome itself uses for its "Automatic"
-  appearance setting. "Light"/"Dark" pin it regardless of that.
+  appearance setting. "Light"/"Dark" pin it regardless of that.  
 - The popup's shortcut list always renders icons at a fixed size/color
   (dark gray, matching its own fixed light background), independent of the
   **Appearance** section - that section's colors are for the on-page panel,
@@ -178,61 +181,6 @@ custom shortcuts on websites whose URL matches a regex you configure.
   the popup could make an icon invisible (e.g. white icons on the popup's
   light list background).
 
-## Notes
-
-- Configuration is stored in `chrome.storage.local` (not synced), since icons
-  can be large `data:` URIs that would exceed `storage.sync` quotas. The
-  extension requests the `unlimitedStorage` permission so a large
-  configuration (many rules/shortcuts, or several image icons) doesn't hit
-  `chrome.storage.local`'s own default quota either.
-- The content script runs on all pages but only renders anything when a rule
-  matches, so the footprint on non-matching sites is a single cheap regex
-  test.
-- Chrome extension icons must be PNG (it doesn't support SVG for
-  `extension/manifest.json`'s `icons`/`action.default_icon` fields). `extension/icons/icon.svg`
-  is the source of truth for the extension's own toolbar/store icon — edit it
-  and regenerate `extension/icons/icon{16,32,48,128}.png` from it (e.g. via `cairosvg`,
-  rendering at high resolution and downsampling with a quality filter for
-  crisper small sizes) rather than editing the PNGs directly.
-- The floating panel's own ![⚡](extension/icons/icon16.png) toggle button uses a separate asset,
-  `extension/icons/icon-overlay.svg` — same artwork as `icon.svg` but with the
-  background dropped (transparent) and a thin outline added to the chain
-  links instead, since it sits on top of the toggle button's own
-  (user-configurable) accent color rather than a fixed dark square. Unlike
-  the manifest icons, this one *is* used directly as an SVG (loaded via
-  `chrome.runtime.getURL()` into an `<img>`), since the "PNG only" rule only
-  applies to the manifest's own icon fields, not to images used within pages
-  the extension injects/renders. It's declared in `web_accessible_resources`
-  so content scripts can load it into the pages they run on.
-- Tabler icon support bundles the official
-  [`@tabler/icons-sprite`](https://tabler.io/icons) outline set (MIT
-  licensed — see `extension/icons/TABLER-ICONS-LICENSE.txt`) as a single ~2.2MB sprite
-  file, `extension/icons/tabler-sprite.svg` (all ~5,130 icons as `<symbol>` elements,
-  rendered via `<use href="tabler-sprite.svg#tabler-NAME">`), plus
-  `extension/icons/tabler-icons-data.js` (a generated `window.TABLER_ICON_NAMES` array
-  used only by the options page's `:`-search-in-the-icon-field feature).
-  Bundled rather than loaded from a CDN at runtime, so icon search/rendering
-  works fully offline and doesn't depend on a third party staying up. To
-  update to a newer Tabler release, re-download `tabler-sprite.svg` from the
-  `@tabler/icons-sprite` npm package and regenerate `tabler-icons-data.js`
-  by extracting `<symbol id="tabler-NAME">` ids from it. A shortcut's icon
-  value is stored as `:name` (e.g. `:star`); the old `tabler:name` form
-  from before this prefix changed is still recognized when reading existing
-  configurations, but is no longer written.
-- On regular web pages, Tabler icons are rendered via `<svg><use
-  href="#tabler-NAME">`, referencing a *same-tree* copy of the sprite
-  rather than the extension's `chrome-extension://.../tabler-sprite.svg`
-  URL directly. `<use>` references across origins (an extension URL from a
-  page on a different origin) are blocked by the browser ("Unsafe attempt
-  to load URL... Domains, protocols and ports must match"), so
-  `buildIconElement()` in `extension/common.js` fetches the sprite once and inlines
-  it into a hidden container, then points every icon's `<use>` at the
-  local fragment. `<use>` fragment lookups are also scoped to the shadow
-  tree they're rendered in, so `buildIconElement()` takes the actual
-  render root (the floating panel's shadow root for content.js, the
-  document itself for the options page/popup) and inlines a copy there
-  specifically — a copy sitting in the page's light DOM wouldn't be
-  visible to `<use>` elements inside the panel's shadow root.
 
 ## License
 
