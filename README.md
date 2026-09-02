@@ -96,9 +96,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
 
 ## Using it
 
-
-![Options page, light theme](media/options_light.png){ height=100px }
-![Options page, dark theme](media/options_dark.png){ height=100px }
+<img src="media/options_light.png" alt="Options page, light theme" height="300"/><img src="media/options_dark.png" alt="Options page, dark theme" height="300"/>
 
 - The floating panel appears on any page matching an enabled rule, in the
   corner (or bar) you pick on the options page's **Shortcut panel position**
