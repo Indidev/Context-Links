@@ -672,6 +672,24 @@ h2 {
   border-radius: 6px;
 }
 
+.shortcut-row.dragging {
+  opacity: 0.4;
+}
+
+.shortcut-drag-handle {
+  flex: none;
+  cursor: grab;
+  color: var(--faint-text);
+  font-size: 16px;
+  line-height: 1;
+  user-select: none;
+  margin-top: 4px;
+}
+
+.shortcut-drag-handle:active {
+  cursor: grabbing;
+}
+
 .shortcut-preview {
   width: 28px;
   height: 28px;
@@ -719,6 +737,23 @@ h2 {
 .icon-search-wrap {
   position: relative;
   flex: 1;
+}
+
+.sc-newtab-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted-text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sc-newtab-field input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
 }
 
 .icon-search-wrap .sc-icon {

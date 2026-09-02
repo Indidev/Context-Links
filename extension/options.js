@@ -20,6 +20,7 @@
   const previewPanel = document.getElementById("preview-panel");
   const previewList = document.getElementById("preview-list");
   const previewPageContent = document.getElementById("preview-page-content");
+  const previewHint = document.getElementById("preview-hint");
   const colorBackgroundInput = document.getElementById("color-background");
   const colorTextInput = document.getElementById("color-text");
   const colorOpacityInput = document.getElementById("color-opacity");
@@ -81,12 +82,14 @@
     });
   });
 
-  // Finds which rule card a dragged card should be inserted before, based on vertical mouse
-  // position - the card whose vertical midpoint the cursor is above, or null (append to the
-  // end) if the cursor is below every card's midpoint.
-  function ruleCardDragAfterElement(y) {
-    const cards = Array.from(rulesContainer.querySelectorAll(".rule-card:not(.dragging)"));
-    return cards.reduce(
+  // Finds which child of `container` (matching `selector`, i.e. excluding the one currently
+  // being dragged) a dragged element should be inserted before, based on vertical mouse
+  // position - the element whose vertical midpoint the cursor is above, or null (append to
+  // the end) if the cursor is below every element's midpoint. Shared by rule-card and
+  // shortcut-row drag-and-drop reordering below.
+  function dragAfterElement(container, selector, y) {
+    const els = Array.from(container.querySelectorAll(selector));
+    return els.reduce(
       (closest, el) => {
         const box = el.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
@@ -105,7 +108,7 @@
     if (!dragging) return;
     evt.preventDefault();
     evt.dataTransfer.dropEffect = "move";
-    const afterElement = ruleCardDragAfterElement(evt.clientY);
+    const afterElement = dragAfterElement(rulesContainer, ".rule-card:not(.dragging)", evt.clientY);
     if (afterElement == null) {
       rulesContainer.appendChild(dragging);
     } else if (afterElement !== dragging) {
@@ -113,6 +116,26 @@
     }
   });
   rulesContainer.addEventListener("drop", (evt) => evt.preventDefault());
+
+  // Drag-and-drop shortcut reordering, including across rules: delegated on the container
+  // (rather than per rule's shortcuts-list) so a shortcut can be dropped into any *expanded*
+  // rule's list, not just the one it started in. `evt.target.closest` finds whichever
+  // shortcuts-list the cursor is currently over; a collapsed rule's list is hidden and so isn't
+  // a valid drop target, same as it isn't a visible/interactable target for anything else.
+  rulesContainer.addEventListener("dragover", (evt) => {
+    const dragging = rulesContainer.querySelector(".shortcut-row.dragging");
+    if (!dragging) return;
+    const targetList = evt.target.closest(".shortcuts-list");
+    if (!targetList) return;
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = "move";
+    const afterElement = dragAfterElement(targetList, ".shortcut-row:not(.dragging)", evt.clientY);
+    if (afterElement == null) {
+      targetList.appendChild(dragging);
+    } else if (afterElement !== dragging) {
+      targetList.insertBefore(dragging, afterElement);
+    }
+  });
 
   function scheduleSave() {
     saveStatus.textContent = "Saving…";
@@ -181,10 +204,13 @@
 
   function renderShortcutRow(rule, shortcut) {
     const node = shortcutTemplate.content.firstElementChild.cloneNode(true);
+    node.dataset.shortcutId = shortcut.id;
+    const dragHandle = node.querySelector(".shortcut-drag-handle");
     const preview = node.querySelector(".shortcut-preview");
     const nameInput = node.querySelector(".sc-name");
     const descInput = node.querySelector(".sc-description");
     const targetInput = node.querySelector(".sc-target");
+    const newTabInput = node.querySelector(".sc-new-tab");
     const iconInput = node.querySelector(".sc-icon");
     const iconUploadBtn = node.querySelector(".sc-icon-upload-btn");
     const iconFile = node.querySelector(".sc-icon-file");
@@ -194,6 +220,7 @@
     nameInput.value = shortcut.name || "";
     descInput.value = shortcut.description || "";
     targetInput.value = shortcut.targetUrl || "";
+    newTabInput.checked = !!shortcut.openInNewTab;
     iconInput.value = shortcut.icon || "";
     updateIconPreview(preview, shortcut.icon);
 
@@ -207,6 +234,10 @@
     });
     targetInput.addEventListener("input", () => {
       shortcut.targetUrl = targetInput.value;
+      scheduleSave();
+    });
+    newTabInput.addEventListener("change", () => {
+      shortcut.openInNewTab = newTabInput.checked;
       scheduleSave();
     });
     iconInput.addEventListener("input", () => {
@@ -242,6 +273,30 @@
       rule.shortcuts = rule.shortcuts.filter((s) => s.id !== shortcut.id);
       renderAll();
       scheduleSave();
+    });
+    dragHandle.addEventListener("dragstart", (evt) => {
+      evt.dataTransfer.effectAllowed = "move";
+      evt.dataTransfer.setData("text/plain", shortcut.id);
+      node.classList.add("dragging");
+    });
+    dragHandle.addEventListener("dragend", () => {
+      node.classList.remove("dragging");
+      // The dragover handler already moved the DOM node live as a preview - possibly into a
+      // different rule's shortcuts-list - so read the final owning list back to find which
+      // rule it landed in, and that list's final order (matched by id, not index).
+      const destList = node.parentElement;
+      const destRule = rules.find((r) => r.id === destList.dataset.ruleId) || rule;
+      const movedAcrossRules = destRule !== rule;
+      if (movedAcrossRules) {
+        rule.shortcuts = rule.shortcuts.filter((s) => s.id !== shortcut.id);
+        destRule.shortcuts.push(shortcut);
+      }
+      const newOrder = Array.from(destList.querySelectorAll(".shortcut-row")).map((el) => el.dataset.shortcutId);
+      destRule.shortcuts.sort((a, b) => newOrder.indexOf(a.id) - newOrder.indexOf(b.id));
+      scheduleSave();
+      // Re-render so both rules' summaries update and every row's closures pick up the
+      // shortcut's new owning rule (this row's own closures still reference the old `rule`).
+      if (movedAcrossRules) renderAll();
     });
 
     function hideIconSuggestions() {
@@ -364,6 +419,7 @@
     const addShortcutBtn = node.querySelector(".add-shortcut-btn");
 
     card.dataset.ruleId = rule.id;
+    shortcutsList.dataset.ruleId = rule.id;
     card.classList.toggle("expanded", expandedRuleIds.has(rule.id));
     enabledInput.checked = rule.enabled !== false;
     nameInput.value = rule.name || "";
@@ -456,6 +512,7 @@
       rulesContainer.appendChild(renderRuleCard(rule));
     }
     renderTestResults();
+    renderPreviewShortcuts();
   }
 
   function renderTestResults() {
@@ -627,16 +684,22 @@
   function previewAnimateBatch(elements, direction, onAllDone) {
     const type = animationTypeSelect.value;
     const duration = Number(animationDurationInput.value);
-    if (!elements.length || type === "none") {
+    if (!elements.length) {
       if (onAllDone) onAllDone();
       return;
     }
     // Cancel any in-flight (or finished-but-still-attached) animation BEFORE measuring - a
     // fill:forwards effect keeps offsetting the element via transform even after it "finishes"
     // (finishing alone doesn't detach it), which would otherwise throw off
-    // getBoundingClientRect() and produce a near-zero vector on the next run.
+    // getBoundingClientRect() and produce a near-zero vector on the next run. Also needed for
+    // "none" itself: switching to "none" after hiding with e.g. "balloon" must still clear that
+    // exit animation's fill:both end frame, or the elements stay stuck invisible.
     for (const el of elements) {
       for (const anim of el.getAnimations()) anim.cancel();
+    }
+    if (type === "none") {
+      if (onAllDone) onAllDone();
+      return;
     }
     const items = elements.map((el) => ({ el, vector: previewVectorToToggle(el) }));
     if (type === "pop") {
@@ -691,24 +754,41 @@
     return position === "shortcutbar-left" || position === "shortcutbar-right";
   }
 
+  // With a Test URL entered, the live preview shows the actual shortcuts that would appear
+  // for that URL (possibly none) instead of the fixed icon-type examples - so it doubles as a
+  // WYSIWYG check of Appearance/Animation settings against a real rule match.
+  function previewShortcuts() {
+    const url = testUrlInput.value.trim();
+    if (!url) {
+      previewHint.textContent = "Live preview with example shortcuts";
+      return EXAMPLE_SHORTCUTS;
+    }
+    const matches = C.matchShortcuts(url, rules).map((m) => m.shortcut);
+    previewHint.textContent = matches.length
+      ? "Live preview of shortcuts matching this Test URL"
+      : "No shortcuts would be shown for this URL";
+    return matches;
+  }
+
   function renderPreviewShortcuts() {
     previewList.innerHTML = "";
-    for (const example of EXAMPLE_SHORTCUTS) {
+    for (const example of previewShortcuts()) {
       const btn = document.createElement("button");
       btn.className = "shortcut-btn";
       btn.type = "button";
       btn.tabIndex = -1;
       btn.title = C.tooltipFor(example);
+      const label = example.name || example.targetUrl || "";
       if (example.icon) {
         btn.appendChild(C.buildIconElement(example.icon, tablerRenderSettings()));
         if (currentAppearance.showTextWithIcons) {
-          const label = document.createElement("span");
-          label.className = "label";
-          label.textContent = example.name;
-          btn.appendChild(label);
+          const labelEl = document.createElement("span");
+          labelEl.className = "label";
+          labelEl.textContent = label;
+          btn.appendChild(labelEl);
         }
       } else {
-        btn.textContent = example.name;
+        btn.textContent = label;
       }
       previewList.appendChild(btn);
     }
@@ -740,7 +820,10 @@
     });
   }
 
-  testUrlInput.addEventListener("input", renderTestResults);
+  testUrlInput.addEventListener("input", () => {
+    renderTestResults();
+    renderPreviewShortcuts();
+  });
 
   exportBtn.addEventListener("click", () => {
     const blob = new Blob([JSON.stringify(rules, null, 2)], { type: "application/json" });
@@ -775,6 +858,9 @@
   });
 
   async function init() {
+    // Never persisted (not part of settings/rules storage) - explicitly cleared here too in
+    // case the browser's own form-restore (bfcache, reload) refilled it from a previous visit.
+    testUrlInput.value = "";
     const [settings, storedRules] = await Promise.all([C.getSettings(), C.getRules()]);
     currentTheme = settings.theme;
     applyTheme(currentTheme);

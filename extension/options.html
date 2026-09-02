@@ -69,7 +69,7 @@
               <button type="button" class="toggle-btn" tabindex="-1"><img src="icons/icon-overlay.svg" alt="" /></button>
             </div>
           </div>
-          <p class="hint">Live preview with example shortcuts</p>
+          <p class="hint" id="preview-hint">Live preview with example shortcuts</p>
         </div>
       </div>
     </section>
@@ -133,7 +133,7 @@
 
     <section class="test-box">
       <h2>Test a URL</h2>
-      <input type="text" id="test-url" placeholder="https://example.com/some/page" />
+      <input type="text" id="test-url" placeholder="https://example.com/some/page" autocomplete="off" />
       <div id="test-results" class="test-results"></div>
     </section>
 
@@ -192,6 +192,7 @@
 
   <template id="shortcut-template">
     <div class="shortcut-row">
+      <span class="shortcut-drag-handle" draggable="true" title="Drag to reorder">⠿</span>
       <div class="shortcut-preview" aria-hidden="true"></div>
       <div class="shortcut-fields">
         <input type="text" class="sc-name" placeholder="Name" />
@@ -204,6 +205,10 @@
           </div>
           <button class="btn secondary sc-icon-upload-btn">Upload</button>
           <input type="file" class="sc-icon-file" accept="image/*" hidden />
+          <label class="sc-newtab-field" title="Open this shortcut's target in a new tab">
+            <input type="checkbox" class="sc-new-tab" />
+            <span>New tab</span>
+          </label>
         </div>
       </div>
       <button class="btn danger delete-shortcut-btn" title="Delete shortcut">✕</button>

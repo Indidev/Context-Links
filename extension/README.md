@@ -7,7 +7,7 @@ custom shortcuts on websites whose URL matches a regex you configure.
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode** (top right).
-3. Click **Load unpacked** and select this folder.
+3. Click **Load unpacked** and select the extension folder.
 4. Click the extension icon and choose **Manage shortcuts** to open the
    options page and add rules.
 
@@ -85,6 +85,11 @@ custom shortcuts on websites whose URL matches a regex you configure.
       separate per-icon color/size setting.
   - `Description` — shown together with the name in the hover tooltip:
     `Name - Description`.
+  - `New tab` — checkbox, off by default. When on, clicking the shortcut
+    always opens its target in a new tab, same as Ctrl/Cmd-clicking it.
+  - Drag a shortcut by its ⠿ handle to reorder it within its rule, or drop
+    it into a different (expanded) rule's shortcut list to move it there -
+    shortcut order determines display order in the panel (see above).
 
 ## Using it
 
@@ -106,8 +111,12 @@ custom shortcuts on websites whose URL matches a regex you configure.
   even with the on-page overlay off. To disable the extension entirely,
   use Chrome's own extensions menu instead.
 - The options page has a "Test a URL" box to check which rules/shortcuts
-  would fire for a given URL without leaving the settings page, plus
-  Export/Import buttons for backing up your configuration as JSON.
+  would fire for a given URL without leaving the settings page - typing one
+  in also swaps the live preview above the position picker from generic
+  icon-type examples to the actual matching shortcuts (or none, if the URL
+  doesn't match any rule), so you can see exactly what that page would show.
+  The Test URL itself is never saved - it's cleared again on every reload.
+  Plus Export/Import buttons for backing up your configuration as JSON.
 - The **Appearance** section on the options page lets you customize the
   panel's background color, background opacity (10–100%), text color, and an
   overall size; the live preview above the position picker updates

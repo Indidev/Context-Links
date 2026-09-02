@@ -37,7 +37,7 @@
       window.close();
       return;
     }
-    if (evt.ctrlKey || evt.metaKey) {
+    if (evt.ctrlKey || evt.metaKey || shortcut.openInNewTab) {
       chrome.tabs.create({ url: action.url, active: true });
     } else {
       chrome.tabs.update(activeTab.id, { url: action.url });

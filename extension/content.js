@@ -116,6 +116,10 @@
       return;
     }
     if (cfg.type === "none" || prefersReducedMotion()) {
+      // A previous batch may have left a `fill: "both"` exit animation attached (e.g. hidden
+      // via "balloon" before switching to "None") - cancel it so elements snap back to their
+      // natural, visible state instead of staying stuck at the exit animation's end frame.
+      elements.forEach(cancelExistingAnimation);
       if (onAllDone) onAllDone();
       return;
     }
@@ -464,7 +468,7 @@
   function handleShortcutClick(evt, shortcut, match) {
     evt.preventDefault();
     const action = C.resolveAction(shortcut.targetUrl, window.location.href, match);
-    const newTab = evt.ctrlKey || evt.metaKey || evt.button === 1;
+    const newTab = evt.ctrlKey || evt.metaKey || evt.button === 1 || !!shortcut.openInNewTab;
     if (action.type === "javascript") {
       // javascript: shortcuts always run against the current tab.
       runJavascriptShortcut(action.code);

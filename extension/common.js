@@ -70,7 +70,8 @@
       name: "",
       description: "",
       icon: "",
-      targetUrl: ""
+      targetUrl: "",
+      openInNewTab: false
     };
   }
 
