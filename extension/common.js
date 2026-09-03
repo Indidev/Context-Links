@@ -71,7 +71,9 @@
       description: "",
       icon: "",
       targetUrl: "",
-      openInNewTab: false
+      openInNewTab: false,
+      blacklistPattern: "",
+      blacklistFlags: "i"
     };
   }
 
@@ -210,6 +212,18 @@
     return null;
   }
 
+  // A shortcut's own optional blacklist regex - independent of the rule's conditions - hides
+  // just that one shortcut on matching URLs while leaving the rest of the rule's shortcuts (and
+  // the rule's own match/$1-substitution) unaffected. Empty or invalid patterns are inert.
+  function shortcutIsBlacklisted(url, shortcut) {
+    if (!shortcut || !shortcut.blacklistPattern) return false;
+    try {
+      return new RegExp(shortcut.blacklistPattern, shortcut.blacklistFlags || "").test(url);
+    } catch (err) {
+      return false;
+    }
+  }
+
   // Returns a flat list of { rule, shortcut } for shortcuts whose rule matches the URL.
   function matchShortcuts(url, rules) {
     const matches = [];
@@ -226,6 +240,7 @@
       if (!match) continue;
       for (const shortcut of rule.shortcuts || []) {
         if (!shortcut.targetUrl) continue;
+        if (shortcutIsBlacklisted(url, shortcut)) continue;
         matches.push({ rule, shortcut, match });
       }
     }
@@ -412,6 +427,7 @@
     setRules,
     matchShortcuts,
     resolveRuleMatch,
+    shortcutIsBlacklisted,
     substituteGroups,
     looksLikeBareHost,
     resolveAction,

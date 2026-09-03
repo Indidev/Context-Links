@@ -97,6 +97,12 @@ custom shortcuts on websites whose URL matches a regex you configure.
     `Name - Description`.
   - `New tab` — checkbox, off by default. When on, clicking the shortcut
     always opens its target in a new tab, same as Ctrl/Cmd-clicking it.
+  - `Hide on` — optional regex + flags. When set and it matches the page
+    URL, this one shortcut is hidden even though its rule still matches -
+    the rest of the rule's shortcuts are unaffected. E.g. a rule matching
+    `google\.com/.*` with a shortcut whose `Hide on` is `google\.com/maps`
+    hides just that shortcut on Google Maps while the rest of the rule's
+    shortcuts keep showing there.
   - Drag a shortcut by its ⠿ handle to reorder it within its rule, or drop
     it into a different (expanded) rule's shortcut list to move it there -
     shortcut order determines display order in the panel (see above).
@@ -188,7 +194,6 @@ custom shortcuts on websites whose URL matches a regex you configure.
 
 ## Bucketlist
 
-* Optional blacklist regex for single links
 * Matching dark theme for short menu
 * Regex Builder (must have, optional, capture group,...)
 * Create Rule from current website

@@ -216,12 +216,16 @@
     const iconFile = node.querySelector(".sc-icon-file");
     const deleteBtn = node.querySelector(".delete-shortcut-btn");
     const iconSuggestions = node.querySelector(".tabler-suggestions");
+    const blacklistPatternInput = node.querySelector(".sc-blacklist-pattern");
+    const blacklistFlagsInput = node.querySelector(".sc-blacklist-flags");
 
     nameInput.value = shortcut.name || "";
     descInput.value = shortcut.description || "";
     targetInput.value = shortcut.targetUrl || "";
     newTabInput.checked = !!shortcut.openInNewTab;
     iconInput.value = shortcut.icon || "";
+    blacklistPatternInput.value = shortcut.blacklistPattern || "";
+    blacklistFlagsInput.value = shortcut.blacklistFlags || "";
     updateIconPreview(preview, shortcut.icon);
 
     nameInput.addEventListener("input", () => {
@@ -238,6 +242,16 @@
     });
     newTabInput.addEventListener("change", () => {
       shortcut.openInNewTab = newTabInput.checked;
+      scheduleSave();
+    });
+    blacklistPatternInput.addEventListener("input", () => {
+      shortcut.blacklistPattern = blacklistPatternInput.value;
+      blacklistPatternInput.classList.toggle("invalid", !isValidRegex(shortcut.blacklistPattern, shortcut.blacklistFlags));
+      scheduleSave();
+    });
+    blacklistFlagsInput.addEventListener("input", () => {
+      shortcut.blacklistFlags = blacklistFlagsInput.value;
+      blacklistPatternInput.classList.toggle("invalid", !isValidRegex(shortcut.blacklistPattern, shortcut.blacklistFlags));
       scheduleSave();
     });
     iconInput.addEventListener("input", () => {
